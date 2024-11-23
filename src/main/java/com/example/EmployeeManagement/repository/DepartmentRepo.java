@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DepartmentRepo extends MongoRepository<Department, ObjectId> {
+   // Check if department exists by its name
+   boolean existsByDepartment(String department);
 }

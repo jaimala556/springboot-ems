@@ -1,6 +1,11 @@
 package com.example.EmployeeManagement.Helpers;
 
+import com.example.EmployeeManagement.configurations.Deserialization;
+import com.example.EmployeeManagement.configurations.Serialization;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -16,6 +21,9 @@ public class ProjectHelper {
     private String techStack;
     private String clientName;
     private Integer budget;
-    private List<String> employees;
+
+    @JsonSerialize(using = Serialization.class)
+    @JsonDeserialize(using = Deserialization.class)
+    private List<ObjectId> employees;
 
 }

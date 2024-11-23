@@ -1,5 +1,9 @@
 package com.example.EmployeeManagement.model;
 
+import com.example.EmployeeManagement.configurations.Deserialization;
+import com.example.EmployeeManagement.configurations.Serialization;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -22,7 +26,11 @@ public class Project {
     private String techStack;
     private String clientName;
     private Integer budget;
-    private List<String> employees;
+
+    @JsonSerialize(using = Serialization.class)
+    @JsonDeserialize(using = Deserialization.class)
+    private List<ObjectId> employees;
+
     private boolean isActive;
     private LocalDateTime lastUpdate;
 }

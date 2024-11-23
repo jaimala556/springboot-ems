@@ -1,9 +1,10 @@
 package com.example.EmployeeManagement.services;
 
 import com.example.EmployeeManagement.Helpers.EmployeeHelper;
-import com.example.EmployeeManagement.model.Department;
+import com.example.EmployeeManagement.Helpers.UserHelper;
 import com.example.EmployeeManagement.model.Employee;
 import com.example.EmployeeManagement.repository.EmployeeRepo;
+import com.example.EmployeeManagement.repository.ProjectRepo;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,15 @@ import java.util.Optional;
 public class EmployeeService {
     @Autowired
     EmployeeRepo employeeRepo;
+    @Autowired
+    DepartmentService departmentService;
+    @Autowired
+    ProjectRepo projectRepo;
+    @Autowired
+    UserService userService;
 
     public String addEmployee(EmployeeHelper employeeHelper) {
-        Employee employee = new Employee();
+
 
         // verify email id
         List<Employee> employeeArrayList = employeeRepo.findAll();
@@ -28,9 +35,18 @@ public class EmployeeService {
             if (employeeHelper.getEmail().equals(employee1.getEmail())) return "Change email, it is already exists..";
         }
 
+//        verify department
+        if (!departmentService.verifyDepartmentByName(employeeHelper.getDepartment()))
+            return "department not matched....";
 
 //        verify project id
+        if (!employeeHelper.getProjectId().isEmpty()) {
+            for (ObjectId id : employeeHelper.getProjectId()) {
+                if (!projectRepo.existsById(id)) return "Project id  not match...";
+            }
+        }
 
+        Employee employee = new Employee();
         employee.setFirstName(employeeHelper.getFirstName());
         employee.setLastName(employeeHelper.getLastName());
         employee.setDepartment(employeeHelper.getDepartment());
@@ -42,6 +58,12 @@ public class EmployeeService {
         employee.setEmail(employeeHelper.getEmail());
         employee.setLastUpdate(LocalDateTime.now());
         employeeRepo.save(employee);
+//        create user account for login
+
+        UserHelper userHelper=new UserHelper();
+        userHelper.setFirstName(employeeHelper.getFirstName());
+        userHelper.setEmail(employeeHelper.getEmail());
+        userService.addUser(userHelper);
         return "save employee......";
     }
 
@@ -83,7 +105,7 @@ public class EmployeeService {
         return "employee updated....";
     }
 
-    public String deleteEmployee(ObjectId id) {
+    public String deleteEmployeeById(ObjectId id) {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (employee.isEmpty()) {
             return "Employee not found....";
@@ -100,5 +122,11 @@ public class EmployeeService {
     public List<Employee> getEmployees() {
         return employeeRepo.findAll();
 
+    }
+
+
+    //    verify employee using their id
+    public boolean verifyEmployeeById(ObjectId id) {
+        return employeeRepo.existsById(id);
     }
 }

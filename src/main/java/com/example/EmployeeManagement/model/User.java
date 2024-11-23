@@ -20,6 +20,7 @@ public class User {
     private String password;
     private String firstname;
     private boolean isLoggedIn;
+    private int otp;
     private String isActive;
     private LocalDateTime lastUpdate;
 }
